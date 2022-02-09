@@ -1,0 +1,99 @@
+`timescale 1ps/1ps
+module ampliTB();
+
+wire clk;
+inverter #(5,2)inv(1'b1,clk);
+
+reg rst;
+reg cnt, ld;
+reg [7:0]in;
+wire co1, co2;
+wire [3:0]out1, out2;
+reg [2:0] func;
+wire [7:0] signal;
+wire [7:0] signal_out;
+
+reg clk_in;
+
+initial begin
+	clk_in = 1'b0;
+end
+
+reg[1:0] am;
+
+frequency_divider fre1( clk, rst, cnt, ld || co2 , in[3:0], co1,out1);
+frequency_divider fre2( co1, rst, cnt, ld || co2 , in[7:4], co2,out2);
+
+waveform_generator WG(clk_in, rst, func, signal);
+amplitude ampli(signal,am, signal_out);
+
+always@(co2)begin 
+clk_in = co2 ? ~clk_in : clk_in;
+end
+
+initial begin
+in =8'b00000011;
+am = 2'b00;
+rst = 1'b0;
+cnt = 1'b1;
+#100 ld = 1'b1;
+#500 ld = 1'b0;
+///////////////
+func = 3'b000;
+am = 2'b10;
+#5000000;
+am = 2'b01;
+#5000000;
+/////////////////
+in = 8'b00000011;
+am = 2'b10;
+func = 3'b001;
+#5000000;
+am = 2'b01;
+#5000000;
+///////////////////
+in = 8'b00000011;
+am = 2'b10;
+func = 3'b010;
+#5000000;
+am = 2'b11;
+#5000000;
+/////////////////
+in = 8'b00000011;
+am = 2'b01;
+func = 3'b011;
+#5000000; 
+am = 2'b10;
+#5000000;
+////////////////
+in = 8'b00000011;
+am = 2'b10;
+func = 3'b100;
+#5000000; 
+am = 2'b01;
+#5000000;
+///////////////////
+
+in = 8'b00000011;
+am = 2'b01;
+func = 3'b101;
+#5000000; 
+am = 2'b10;
+#5000000;
+///////////////////
+
+in = 8'b00000011;
+am = 2'b01;
+func = 3'b110;
+#5000000; 
+am = 2'b11;
+#5000000;
+/////////////////////
+
+#100000 $stop;
+
+end
+
+
+endmodule
+
